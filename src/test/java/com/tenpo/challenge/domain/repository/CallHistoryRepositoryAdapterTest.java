@@ -7,6 +7,7 @@ import com.tenpo.challenge.infrastructure.persistence.CallHistoryRepositoryAdapt
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -23,6 +24,11 @@ public class CallHistoryRepositoryAdapterTest {
     private CallHistoryJpaRepository callHistoryJpaRepository;
 
     private CallHistoryRepositoryAdapter callHistoryRepositoryAdapter;
+
+    @BeforeEach
+    void setUp() {
+        callHistoryRepositoryAdapter = new CallHistoryRepositoryAdapter(callHistoryJpaRepository);
+    }
 
     @Test
     void saveTest() {
