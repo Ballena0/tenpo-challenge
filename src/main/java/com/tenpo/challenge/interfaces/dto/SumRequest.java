@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class SumRequest {
-    private double a;
-    private double b;
+    private Double operand1;
+    private Double operand2;
 }

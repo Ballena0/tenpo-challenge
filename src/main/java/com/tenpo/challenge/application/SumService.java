@@ -2,6 +2,9 @@ package com.tenpo.challenge.application;
 
 import java.time.LocalDateTime;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.tenpo.challenge.domain.model.CallHistory;
@@ -9,6 +12,7 @@ import com.tenpo.challenge.domain.repository.CallHistoryRepository;
 
 @Service
 public class SumService {
+    private static final Logger logger = LoggerFactory.getLogger(SumService.class);
     private final CallHistoryRepository callHistoryRepository;
 
     public SumService(CallHistoryRepository callHistoryRepository) {
@@ -20,7 +24,8 @@ public class SumService {
         return result;
     }
 
-    public void saveCallHistory(double a, double b, double statusCode, String endpoint, LocalDateTime date, String response){ 
+    @Async
+    public void saveCallHistoryAsync(Double a, Double b, double statusCode, String endpoint, LocalDateTime date, String response){ 
         try {
             CallHistory callHistory = new CallHistory(
             null,
@@ -33,8 +38,9 @@ public class SumService {
         );
 
             callHistoryRepository.save(callHistory);
+            logger.info("Call history saved!!");
         } catch (Exception e) {
-            System.out.println("Error saving call history: " + e.getMessage());
+            logger.error("Error saving call history: " + e.getMessage());
         };
     }
 }

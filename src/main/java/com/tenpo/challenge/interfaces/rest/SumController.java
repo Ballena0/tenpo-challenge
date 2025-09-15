@@ -23,10 +23,18 @@ public class SumController {
 
     @PostMapping("/sum")
     public ResponseEntity<SumResponse> sum(@RequestBody SumRequest request) {
-        double result = sumService.sum(request.getA(), request.getB());
+        if (request == null){
+            sumService.saveCallHistoryAsync(null, null, 400, "/api/sum", java.time.LocalDateTime.now(), "Bad request: null body");
+            return ResponseEntity.badRequest().build();
+        }
+        if (request.getOperand1() == null || request.getOperand2() == null){
+            sumService.saveCallHistoryAsync(null, null, 500, "/api/sum", java.time.LocalDateTime.now(), "Bad ~request: null operands");
+            return ResponseEntity.badRequest().build();
+        }
+        double result = sumService.sum(request.getOperand1(), request.getOperand2());
 
         // implement save async in service and call here
-        sumService.saveCallHistory(request.getA(), request.getB(), 200, "/api/sum", java.time.LocalDateTime.now(), String.valueOf(result));
+        sumService.saveCallHistoryAsync(request.getOperand1(), request.getOperand2(), 200, "/api/sum", java.time.LocalDateTime.now(), String.valueOf(result));
         
         return ResponseEntity.ok(new SumResponse(result));
     }
