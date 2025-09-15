@@ -26,6 +26,7 @@ public class SumController {
         double result = sumService.sum(request.getA(), request.getB());
 
         // implement save async in service and call here
+        sumService.saveCallHistory(request.getA(), request.getB(), 200, "/api/sum", java.time.LocalDateTime.now(), String.valueOf(result));
         
         return ResponseEntity.ok(new SumResponse(result));
     }
