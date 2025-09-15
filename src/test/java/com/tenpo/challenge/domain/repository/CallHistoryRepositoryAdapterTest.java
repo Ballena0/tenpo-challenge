@@ -55,5 +55,9 @@ public class CallHistoryRepositoryAdapterTest {
 
         // assert
         assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals(callHistory.getId(), result.getId());
+
+        verify(callHistoryJpaRepository, times(1)).save(any(CallHistoryEntity.class)); //assert_called_once 
     }
 }
