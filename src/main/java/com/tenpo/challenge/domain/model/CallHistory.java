@@ -1,15 +1,21 @@
 package com.tenpo.challenge.domain.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "call_history")
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CallHistory {
-    @Id
-    private Long id;
     
+    private Long id;
+    private double operand1;
+    private double operand2;
     private String endpoint;
-    private String requestPayload;
+    private LocalDateTime timestamp;
+    private Long statusCode;
+    private String response;
 }

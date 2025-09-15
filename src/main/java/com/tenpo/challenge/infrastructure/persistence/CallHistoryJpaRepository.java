@@ -1,5 +1,7 @@
 package com.tenpo.challenge.infrastructure.persistence;
 
-public class CallHistoryJpaRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CallHistoryJpaRepository extends JpaRepository<CallHistoryEntity, Long> {
     
 }
