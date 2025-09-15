@@ -36,7 +36,7 @@ public class CallHistoryRepositoryAdapterTest {
         // A
         CallHistory callHistory = new CallHistory(
             null, 5.0, 10.0, "/api/sum",
-            java.time.LocalDateTime.now(), 200L, "{\"result\":15.0}"
+            java.time.LocalDateTime.now(), 200D, "{\"result\":15.0}"
         );
 
         CallHistoryEntity entity = new CallHistoryEntity();

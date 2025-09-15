@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class SumResponse {
-    private double result;
+    private Double result;
 
-    public SumResponse(double result) {
+    public SumResponse(Double result) {
         this.result = result;
     }
 }

@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 public class CallHistory {
     
     private Long id;
-    private double operand1;
-    private double operand2;
+    private Double operand1;
+    private Double operand2;
     private String endpoint;
     private LocalDateTime timestamp;
-    private Long statusCode;
+    private Double statusCode;
     private String response;
 }
