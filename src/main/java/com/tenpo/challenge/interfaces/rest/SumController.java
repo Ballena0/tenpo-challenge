@@ -4,7 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tenpo.challenge.application.SumService;
+import com.tenpo.challenge.application.useCases.GetAllHistory;
+import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.TimeProvider;
+import com.tenpo.challenge.interfaces.dto.CallHistoryResponse;
 import com.tenpo.challenge.interfaces.dto.SumErrorResponse;
 import com.tenpo.challenge.interfaces.dto.SumRequest;
 import com.tenpo.challenge.interfaces.dto.SumResponse;
@@ -18,11 +21,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -30,10 +38,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class SumController {
     private final TimeProvider timeProvider;
     private final SumService sumService;
+    private final GetAllHistory getAllHistory;
 
-    public SumController(SumService sumService, TimeProvider timeProvider) {
+    public SumController(SumService sumService, TimeProvider timeProvider, GetAllHistory getAllHistory) {
         this.sumService = sumService;
         this.timeProvider = timeProvider;
+        this.getAllHistory = getAllHistory;
     }
 
     @PostMapping("/sum")
@@ -69,5 +79,30 @@ public class SumController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SumErrorResponse(400D, e.getMessage()));
         }
+    }
+
+    @GetMapping("/history")
+    @Operation(summary = "Get all calls history", description = "Returns a list of all calls history made to the /sum endpoint")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation",
+        content = @Content(schema = @Schema(implementation = CallHistoryResponse.class)))})
+    public ResponseEntity<List<CallHistoryResponse>> getAllHistory() {
+        List<CallHistory> history = getAllHistory.getAllhistory();
+        List<CallHistoryResponse> response = history.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+    
+    private CallHistoryResponse convertToResponse(CallHistory callHistory) {
+        return new CallHistoryResponse(
+                callHistory.getId(),
+                callHistory.getOperand1(),
+                callHistory.getOperand2(),
+                callHistory.getEndpoint(),
+                callHistory.getTimestamp(),
+                callHistory.getStatusCode(),
+                callHistory.getResponse()
+        );
     }
 }
