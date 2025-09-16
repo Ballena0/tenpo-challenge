@@ -11,6 +11,12 @@ import com.tenpo.challenge.interfaces.dto.SumResponse;
 import com.tenpo.challenge.interfaces.exception.NullOperandException;
 import com.tenpo.challenge.interfaces.exception.NullRequestBodyException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
@@ -31,6 +37,15 @@ public class SumController {
     }
 
     @PostMapping("/sum")
+    @Operation(summary = "Sum two numbers", description = "Returns the sum of two numbers provided in the request body")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation",
+        content = @Content(schema = @Schema(implementation = SumResponse.class))
+        ),
+        @ApiResponse(responseCode = "400", description = "Invalid input, such as null operands or null request body",
+        content = @Content(schema = @Schema(implementation = SumErrorResponse.class))
+        )
+    })
     public ResponseEntity<?> sum(@RequestBody(required = false) SumRequest request) {
         LocalDateTime now = timeProvider.now();
         try {
