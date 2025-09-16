@@ -19,13 +19,22 @@ public class SumService {
         this.callHistoryRepository = callHistoryRepository;
     }
 
-    public double sum(double a, double b){
-        double result = a + b;
+    public Double sum(Double a, Double b){
+        Double result = a + b;
         return result;
     }
 
     @Async
-    public void saveCallHistoryAsync(Double a, Double b, double statusCode, String endpoint, LocalDateTime date, String response){ 
+    public void saveSuccessCallHistoryAsync(Double a, Double b, Double statusCode, String endpoint, LocalDateTime date, String response) {
+        saveCallHistoryAsync(a, b, statusCode, endpoint, date, response);
+    }
+
+    @Async
+    public void saveErrorCallHistoryAsync(Double a, Double b, Double statusCode, String endpoint, LocalDateTime date, String response) {
+        saveCallHistoryAsync(a, b, statusCode, endpoint, date, response);
+    }
+
+    public void saveCallHistoryAsync(Double a, Double b, Double statusCode, String endpoint, LocalDateTime date, String response){ 
         try {
             CallHistory callHistory = new CallHistory(
             null,
@@ -33,7 +42,7 @@ public class SumService {
             b,
             endpoint,
             date,
-            (long) statusCode,
+            statusCode,
             response
         );
 

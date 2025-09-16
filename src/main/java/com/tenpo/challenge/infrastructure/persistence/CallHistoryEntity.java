@@ -16,11 +16,11 @@ public class CallHistoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = true)
-    private double operand1;
+    private Double operand1;
     @Column(nullable = true)
-    private double operand2;
+    private Double operand2;
     private String endpoint;
     private LocalDateTime timestamp;
-    private Long statusCode;
+    private Double statusCode;
     private String response;
 }
