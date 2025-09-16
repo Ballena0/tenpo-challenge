@@ -2,7 +2,6 @@ package com.tenpo.challenge.application;
 
 import static org.mockito.Mockito.*;
 
-import org.aspectj.weaver.ast.Call;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
