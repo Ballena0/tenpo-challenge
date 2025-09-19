@@ -1,5 +1,6 @@
 package com.tenpo.challenge.interfaces.rest;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
@@ -9,11 +10,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.tenpo.challenge.application.GetAllHistoryService;
 import com.tenpo.challenge.application.SumService;
+import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.TimeProvider;
 import com.tenpo.challenge.interfaces.dto.SumRequest;
 
@@ -26,6 +31,9 @@ public class SumControllerTest {
 
     @MockBean
     private SumService sumService;
+
+    @MockBean
+    private GetAllHistoryService getAllHistory;
 
     @MockBean
     private TimeProvider timeProvider;
@@ -107,5 +115,26 @@ public class SumControllerTest {
             eq(dateTime),
             eq("8.0")
         );
+    }
+
+    @Test
+    void getAllHistoryShouldReturnOk() throws Exception{
+        CallHistory record1 = new CallHistory(1L, 5D, 3D, "/api/sum", LocalDateTime.of(2025, 9, 15, 12, 0), 200D, null);
+        CallHistory record2 = new CallHistory(2L, null, 3D, "/api/sum", LocalDateTime.of(2025, 9, 15, 12, 5), null, "operands cannot be null");
+        CallHistory record3 = new CallHistory(3L, 5D, null, "/api/sum", LocalDateTime.of(2025, 9, 15, 12, 0), 400D, "operands cannot be null");
+        
+
+        List<CallHistory> records = List.of(record1, record2, record3);
+        when(getAllHistory.getAllhistory()).thenReturn(records);
+
+        mockMvc.perform(get("/api/history")
+        .contentType("application/json"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].operand1").value(5))
+        .andExpect(jsonPath("$[0].operand2").value(3))
+        .andExpect(jsonPath("$[0].endpoint").value("/api/sum"));
+
+        verify(getAllHistory, times(1)).getAllhistory();
     }
 }

@@ -1,5 +1,8 @@
 package com.tenpo.challenge.infrastructure.persistence;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.CallHistoryRepository;
@@ -28,4 +31,19 @@ public class CallHistoryRepositoryAdapter implements CallHistoryRepository {
         callHistory.setId(savedEntity.getId());
         return callHistory;
     }
+
+    @Override
+    public List<CallHistory> findAll() {
+        return jpaRepository.findAll().stream()
+            .map(entity ->  new CallHistory(
+                entity.getId(),
+                entity.getOperand1(),
+                entity.getOperand2(),
+                entity.getEndpoint(),
+                entity.getTimestamp(),
+                entity.getStatusCode(),
+                entity.getResponse()
+            )).collect(Collectors.toList());
+    };
 }
+
