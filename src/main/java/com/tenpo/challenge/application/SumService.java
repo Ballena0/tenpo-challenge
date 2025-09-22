@@ -26,7 +26,7 @@ public class SumService {
     public Mono<Double> sum(Double a, Double b) {
     return percentageService.fetchNewValue("current_percentage")
             .map(percentage -> {
-                double total = (a + b) + ((a + b) * percentage / 100);
+                Double total = (a + b) * (1 + (percentage / 100));
                 return total;
             });
     }

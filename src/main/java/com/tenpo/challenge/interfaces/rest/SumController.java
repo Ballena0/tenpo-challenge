@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
@@ -78,7 +77,7 @@ public class SumController {
                     );
                     return total;
                 }).subscribeOn(Schedulers.boundedElastic()))
-                .map(total -> new SumResponse(total)); // Convertimos Double a DTO
+                .map(total -> new SumResponse(total));
 
 
             // implement save async in service and call here
