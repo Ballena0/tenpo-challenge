@@ -1,5 +1,10 @@
 # Backend challenge
 
+Para obtener la imagen se puede hacer mediante este repositorio y comandos de docker o a traves de 
+
+    docker pull ballena0/tenpo-backend:latest
+
+
 ## Dependencias
 - Docker
 - Docker compose
