@@ -19,6 +19,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,12 +66,24 @@ public class SumController {
             if (request.getOperand1() == null || request.getOperand2() == null){
                 throw new NullOperandException("operands cannot be null");
         }
-            Double result = sumService.sum(request.getOperand1(), request.getOperand2());
+            Mono<SumResponse> result = sumService.sum(request.getOperand1(), request.getOperand2())
+                .flatMap(total -> Mono.<Double>fromCallable(() -> {
+                    sumService.saveSuccessCallHistoryAsync(
+                            request.getOperand1(),
+                            request.getOperand2(),
+                            200D,
+                            "/api/sum",
+                            now,
+                            total.toString()
+                    );
+                    return total;
+                }).subscribeOn(Schedulers.boundedElastic()))
+                .map(total -> new SumResponse(total)); // Convertimos Double a DTO
+
 
             // implement save async in service and call here
-            sumService.saveSuccessCallHistoryAsync(request.getOperand1(), request.getOperand2(), 200D, "/api/sum", now, String.valueOf(result));
         
-            return ResponseEntity.ok(new SumResponse(result));
+            return ResponseEntity.ok(result);
 
         } catch (NullRequestBodyException | NullOperandException e) {
             Double operand1 = request != null ? request.getOperand1() : null;

@@ -8,9 +8,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.CallHistoryRepository;
+import com.tenpo.challenge.infrastructure.persistence.PercentageJpaRepository;
+
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 public class SumServiceTest {
@@ -18,11 +22,14 @@ public class SumServiceTest {
     @Mock
     private CallHistoryRepository callHistoryRepository;
 
+    @Mock
+    private PercentageService percentageService;
+
     private SumService sumService;
 
     @BeforeEach
     void setUp() {
-        sumService = new SumService(callHistoryRepository);
+        sumService = new SumService(callHistoryRepository, percentageService);
     }
 
     @Test
@@ -31,7 +38,7 @@ public class SumServiceTest {
         Double b = 3.0;
         Double expected = 8.0;
 
-        Double result = sumService.sum(a, b);
+        Mono<Double> result = sumService.sum(a, b);
 
         assert result.equals(expected);
     }
@@ -42,7 +49,7 @@ public class SumServiceTest {
         Double b = -3.0;
         Double expected = -5.0;
 
-        Double result = sumService.sum(a, b);
+        Mono<Double> result = sumService.sum(a, b);
 
         assert result.equals(expected);
     }
