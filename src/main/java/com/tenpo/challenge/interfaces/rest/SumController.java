@@ -56,7 +56,7 @@ public class SumController {
         content = @Content(schema = @Schema(implementation = SumErrorResponse.class))
         )
     })
-    public ResponseEntity<?> sum(@RequestBody(required = false) SumRequest request) {
+    public Mono<ResponseEntity<?>> sum(@RequestBody(required = false) SumRequest request) {
         LocalDateTime now = timeProvider.now();
         try {
             if (request == null){
@@ -82,14 +82,14 @@ public class SumController {
 
             // implement save async in service and call here
         
-            return ResponseEntity.ok(result);
+            return Mono.just(ResponseEntity.ok(result));
 
         } catch (NullRequestBodyException | NullOperandException e) {
             Double operand1 = request != null ? request.getOperand1() : null;
             Double operand2 = request != null ? request.getOperand2() : null;
             sumService.saveErrorCallHistoryAsync(operand1, operand2, 400D, "/api/sum", now, e.getMessage());
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SumErrorResponse(400D, e.getMessage()));
+            return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new SumErrorResponse(400D, e.getMessage())));
         }
     }
 
@@ -98,12 +98,12 @@ public class SumController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful operation",
         content = @Content(schema = @Schema(implementation = CallHistoryResponse.class)))})
-    public ResponseEntity<List<CallHistoryResponse>> getAllHistory() {
+    public Mono<ResponseEntity<List<CallHistoryResponse>>> getAllHistory() {
         List<CallHistory> history = getAllHistory.getAllhistory();
         List<CallHistoryResponse> response = history.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return Mono.just(ResponseEntity.ok(response));
     }
     
     private CallHistoryResponse convertToResponse(CallHistory callHistory) {
