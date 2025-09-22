@@ -89,5 +89,5 @@ challenge/
 
 ## Posibles mejoras o proximos pasos
 - Paginación  > api/history
-- Mayor coverage de tests unitarios sobretodo en la parte de la llamada a terceros
+- Mayor coverage de tests unitarios sobretodo en la parte de la llamada a terceros (test db fallback)
  
