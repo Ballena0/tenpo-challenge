@@ -20,6 +20,8 @@ import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.TimeProvider;
 import com.tenpo.challenge.interfaces.dto.SumRequest;
 
+import reactor.core.publisher.Mono;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 public class SumControllerTest {
@@ -94,7 +96,7 @@ public class SumControllerTest {
         // arrange
         LocalDateTime dateTime = LocalDateTime.of(2025, 9, 15, 12, 0);
         when(timeProvider.now()).thenReturn(dateTime);
-        when(sumService.sum(5D, 3D)).thenReturn(8D);
+        when(sumService.sum(5D, 3D)).thenReturn(Mono.just(8D));
 
         // A
         webTestClient.post().uri("/api/sum")

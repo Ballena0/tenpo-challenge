@@ -10,18 +10,25 @@ import org.springframework.stereotype.Service;
 import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.CallHistoryRepository;
 
+import reactor.core.publisher.Mono;
+
 @Service
 public class SumService {
     private static final Logger logger = LoggerFactory.getLogger(SumService.class);
     private final CallHistoryRepository callHistoryRepository;
+    private final PercentageService percentageService;
 
-    public SumService(CallHistoryRepository callHistoryRepository) {
+    public SumService(CallHistoryRepository callHistoryRepository, PercentageService percentageService) {
         this.callHistoryRepository = callHistoryRepository;
+        this.percentageService = percentageService;
     }
 
-    public Double sum(Double a, Double b){
-        Double result = a + b;
-        return result;
+    public Mono<Double> sum(Double a, Double b) {
+    return percentageService.fetchNewValue("current_percentage")
+            .map(percentage -> {
+                Double total = (a + b) * (1 + (percentage / 100));
+                return total;
+            });
     }
 
     @Async
