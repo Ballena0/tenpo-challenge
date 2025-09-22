@@ -5,13 +5,11 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,12 +20,12 @@ import com.tenpo.challenge.domain.model.CallHistory;
 import com.tenpo.challenge.domain.repository.TimeProvider;
 import com.tenpo.challenge.interfaces.dto.SumRequest;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
 public class SumControllerTest {
     
     @Autowired
-    private MockMvc mockMvc;
+    private WebTestClient webTestClient;
 
     @MockBean
     private SumService sumService;
@@ -43,9 +41,9 @@ public class SumControllerTest {
         LocalDateTime dateTime = LocalDateTime.of(2025, 9, 15, 12, 0);
         when(timeProvider.now()).thenReturn(dateTime);
 
-        mockMvc.perform(post("/api/sum")
-        .contentType("application/json"))
-        .andExpect(status().isBadRequest());
+        webTestClient.post().uri("/api/sum")
+        .exchange()
+        .expectStatus().isBadRequest();
 
         verify(sumService, never()).sum(anyDouble(), anyDouble());
         verify(sumService, times(1))
@@ -71,10 +69,11 @@ public class SumControllerTest {
         request.setOperand2(null);
 
         // act
-        mockMvc.perform(post("/api/sum")
-        .contentType("application/json")
-        .content("{\"operand1\":5,\"operand2\":null}"))
-        .andExpect(status().isBadRequest());
+        webTestClient.post().uri("/api/sum")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue("{\"operand1\":5,\"operand2\":null}")
+        .exchange()
+        .expectStatus().isBadRequest();
 
         // assert
         verify(sumService, never()).sum(anyDouble(), anyDouble());
@@ -98,11 +97,12 @@ public class SumControllerTest {
         when(sumService.sum(5D, 3D)).thenReturn(8D);
 
         // A
-        mockMvc.perform(post("/api/sum")
-        .contentType("application/json")
-        .content("{\"operand1\":5,\"operand2\":3}"))
-        .andExpect(status().isOk())
-        .andExpect(content().json("{\"result\":8}"));
+        webTestClient.post().uri("/api/sum")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue("{\"operand1\":5,\"operand2\":3}")
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody().json("{\"result\":8}");
 
         // assert
         verify(sumService, times(1)).sum(5D, 3D);
@@ -127,13 +127,13 @@ public class SumControllerTest {
         List<CallHistory> records = List.of(record1, record2, record3);
         when(getAllHistory.getAllhistory()).thenReturn(records);
 
-        mockMvc.perform(get("/api/history")
-        .contentType("application/json"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].id").value(1))
-        .andExpect(jsonPath("$[0].operand1").value(5))
-        .andExpect(jsonPath("$[0].operand2").value(3))
-        .andExpect(jsonPath("$[0].endpoint").value("/api/sum"));
+        webTestClient.get().uri("/api/history")
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody().jsonPath("$[0].id").isEqualTo(1)
+        .jsonPath("$[0].operand1").isEqualTo(5)
+        .jsonPath("$[0].operand2").isEqualTo(3)
+        .jsonPath("$[0].endpoint").isEqualTo("/api/sum");
 
         verify(getAllHistory, times(1)).getAllhistory();
     }
